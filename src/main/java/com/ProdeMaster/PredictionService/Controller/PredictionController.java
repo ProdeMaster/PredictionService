@@ -1,5 +1,6 @@
 package com.ProdeMaster.PredictionService.Controller;
 
+import com.ProdeMaster.PredictionService.Dto.PredictionDto;
 import com.ProdeMaster.PredictionService.Model.PredictionModel;
 import com.ProdeMaster.PredictionService.Service.PredictionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ public class PredictionController {
 
     // Crear una nueva predicción
     @PostMapping
-    public ResponseEntity<?> createPrediction(@RequestBody PredictionModel prediction) {
+    public ResponseEntity<?> createPrediction(@RequestBody PredictionDto prediction) {
         try {
             PredictionModel createdPrediction = predictionService.createPrediction(prediction);
             return ResponseEntity.ok(createdPrediction);

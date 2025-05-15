@@ -29,7 +29,7 @@ public class PredictionService {
             throw new IllegalArgumentException("El tiempo para realizar la predicción ha finalizado.");
         }
 
-        PredictionModel newPrediction = new PredictionModel (prediction.getUserId(), prediction.getMatchId(), prediction.getScoreTeam1(), prediction.getScoreTeam2(), LocalDateTime.now(), matchDeadLine.getDeadLine());
+        PredictionModel newPrediction = new PredictionModel (prediction.getUserId(), prediction.getMatchId(), prediction.getScoreTeam1(), prediction.getScoreTeam2(), prediction.getCreatedAt(), matchDeadLine.getDeadLine());
         return predictionRepository.save(newPrediction);
     }
 

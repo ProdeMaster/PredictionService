@@ -11,13 +11,13 @@ public class PredictionDto {
     private Integer scoreTeam2;
     private LocalDateTime createdAt;
 
-    public PredictionDto(Long id, Long userId, String matchId, Integer scoreTeam1, Integer scoreTeam2, LocalDateTime createdAt) {
+    public PredictionDto(Long id, Long userId, String matchId, Integer scoreTeam1, Integer scoreTeam2) {
         this.id = id;
         this.userId = userId;
         this.matchId = matchId;
         this.scoreTeam1 = scoreTeam1;
         this.scoreTeam2 = scoreTeam2;
-        this.createdAt = createdAt;
+        this.createdAt = LocalDateTime.now();
     }
 
     public Long getId() {
