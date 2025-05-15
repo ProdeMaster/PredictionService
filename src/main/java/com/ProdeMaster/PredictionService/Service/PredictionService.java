@@ -2,6 +2,9 @@ package com.ProdeMaster.PredictionService.Service;
 
 import com.ProdeMaster.PredictionService.Model.PredictionModel;
 import com.ProdeMaster.PredictionService.Repository.PredictionRepository;
+import com.ProdeMaster.PredictionService.Dto.PredictionDto;
+import com.ProdeMaster.PredictionService.Service.Client.Dto.DeadlineDto;
+import com.ProdeMaster.PredictionService.Service.Client.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,13 +20,17 @@ public class PredictionService {
     /**
      * Registra una nueva predicción. Valida si se puede registrar basándose en el deadline.
      */
-    public PredictionModel createPrediction(PredictionModel prediction) {
+    public PredictionModel createPrediction(PredictionDto prediction) {
+        // Obtengo la deadline de matchService
+        DeadlineDto matchDeadLine = MatchService.getDeadLine(prediction.getMatchId());
+
         // Validar que la predicción se realiza antes del deadline
-        if (LocalDateTime.now().isAfter(prediction.getDeadline())) {
+        if (LocalDateTime.now().isAfter(matchDeadLine.getDeadLine())) {
             throw new IllegalArgumentException("El tiempo para realizar la predicción ha finalizado.");
         }
-        prediction.setCreatedAt(LocalDateTime.now());
-        return predictionRepository.save(prediction);
+
+        PredictionModel newPrediction = new PredictionModel (prediction.getUserId(), prediction.getMatchId(), prediction.getScoreTeam1(), prediction.getScoreTeam2(), LocalDateTime.now(), matchDeadLine.getDeadLine());
+        return predictionRepository.save(newPrediction);
     }
 
     /**

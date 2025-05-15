@@ -12,7 +12,7 @@ public class PredictionModel {
 
     // Identificador del usuario que realiza la predicción
     @Column(nullable = false)
-    private String userId;
+    private Long userId;
 
     // Identificador del partido
     @Column(nullable = false)
@@ -38,7 +38,7 @@ public class PredictionModel {
     private Integer resultTeam1;
     private Integer resultTeam2;
 
-    public PredictionModel(Long id, String userId, String matchId, Integer scoreTeam1, Integer scoreTeam2, LocalDateTime createdAt, LocalDateTime deadline, Integer resultTeam1, Integer resultTeam2) {
+    public PredictionModel(Long id, Long userId, String matchId, Integer scoreTeam1, Integer scoreTeam2, LocalDateTime createdAt, LocalDateTime deadline, Integer resultTeam1, Integer resultTeam2) {
         this.id = id;
         this.userId = userId;
         this.matchId = matchId;
@@ -50,6 +50,15 @@ public class PredictionModel {
         this.resultTeam2 = resultTeam2;
     }
 
+    public PredictionModel(Long userId, String matchId, Integer scoreTeam1, Integer scoreTeam2, LocalDateTime createdAt, LocalDateTime deadline) {
+        this.userId = userId;
+        this.matchId = matchId;
+        this.scoreTeam1 = scoreTeam1;
+        this.scoreTeam2 = scoreTeam2;
+        this.createdAt = createdAt;
+        this.deadline = deadline;
+    }
+
     public PredictionModel() {
     }
 
@@ -57,7 +66,7 @@ public class PredictionModel {
         return id;
     }
 
-    public String getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
@@ -117,7 +126,7 @@ public class PredictionModel {
         this.matchId = matchId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 }
