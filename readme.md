@@ -1,18 +1,24 @@
 # 🎯 Prediction Service
 
-Este proyecto implementa un servicio de predicciones futbolísticas, permitiendo a los usuarios registrar y actualizar sus predicciones de resultados para partidos. Es parte de un sistema de microservicios basado en Spring Cloud Netflix Eureka
+Prediction Service es un microservicio perteneciente al ecosistema **ProdeMaster**, una plataforma de predicciones deportivas entre amigos inspirada en el tradicional juego argentino Prode.
+
+Este servicio es responsable de gestionar las predicciones realizadas por los usuarios sobre partidos de fútbol, actuando como la fuente de verdad para todas las jugadas registradas en el sistema.
+
+El servicio no calcula puntajes.
+El cálculo de puntos y rankings corresponde al Score Service.
 
 ---
 
 ## 🚀 ¿Qué hace este servicio?
 
-El Prediction Service proporciona una API REST para:
+Prediction Service expone una API REST que permite a los usuarios:
 
-* Registro de predicciones de resultados
-* Actualización de predicciones existentes
-* Enlace entre predicciones, usuarios y partidos
+* Registrar predicciones de resultados para partidos
+* Actualizar predicciones existentes antes de que comience el partido
+* Consultar predicciones realizadas
+* Relacionar predicciones con usuarios y partidos
 
-Este servicio se registra automáticamente en el servidor de Eureka para que otros servicios (como el ApiGateway) puedan enrutar solicitudes hacia él.
+Además, el servicio participa en una arquitectura event-driven, publicando eventos cuando se crean o modifican predicciones.
 
 ---
 
