@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "ddd-hexagonal-architecture": {
+      "source": "teachingai/full-stack-skills",
+      "sourceType": "github",
+      "computedHash": "4771e484c945773c8d0d13e16832520ebad139def25d7450f080c5530b34b587"
+    }
+  }
+}
