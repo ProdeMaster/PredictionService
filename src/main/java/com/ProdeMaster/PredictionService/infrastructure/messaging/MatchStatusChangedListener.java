@@ -31,7 +31,6 @@ public class MatchStatusChangedListener {
         try {
             String matchId = (String) event.get("matchId");
             String newStatus = (String) event.get("newStatus");
-            String previousStatus = (String) event.get("previousStatus");
 
             if (matchId == null || newStatus == null) {
                 log.warn("Invalid event data: missing matchId or newStatus");
