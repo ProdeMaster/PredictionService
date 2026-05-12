@@ -70,7 +70,7 @@ public class UpdatePredictionUseCase implements UpdatePredictionInboundPort {
         MatchScore oldScore = prediction.getPredictedScore();
 
         // 4. Cut-off time guard
-        MatchServiceClient.MatchInfo matchInfo = matchServiceClient.getMatch(prediction.getMatchId());
+        MatchServiceClient.MatchInfo matchInfo = matchServiceClient.getMatchById(prediction.getMatchId());
         Instant matchStartTime = matchInfo.scheduledAt();
         Instant cutoffTime = matchStartTime.minus(bufferMinutesBeforeMatch, ChronoUnit.MINUTES);
         if (Instant.now().isAfter(cutoffTime)) {

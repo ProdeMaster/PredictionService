@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.Instant;
+import org.springframework.lang.NonNull;
 
 @Component
 public class MatchServiceClientImpl implements MatchServiceClient {
@@ -14,17 +15,15 @@ public class MatchServiceClientImpl implements MatchServiceClient {
     private final WebClient webClient;
 
     public MatchServiceClientImpl(
-            @Value("${app.match-service.url}") String matchServiceUrl) {
+            @NonNull @Value("${app.match-service.url}") String matchServiceUrl) {
         this.webClient = WebClient.builder()
                 .baseUrl(matchServiceUrl)
                 .build();
     }
 
-    // TODO: CHANGE THE METHOD getMatch to getMatchById in MatchServiceClient and in
-    // this method
     @Override
     @CircuitBreaker(name = "matchService", fallbackMethod = "fallbackGetMatch")
-    public MatchInfo getMatch(String matchId) {
+    public MatchInfo getMatchById(String matchId) {
         MatchResponse response = webClient.get()
                 .uri("/{id}", matchId)
                 .retrieve()

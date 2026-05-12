@@ -4,7 +4,7 @@ import java.time.Instant;
 
 public interface MatchServiceClient {
 
-    MatchInfo getMatch(String matchId);
+    MatchInfo getMatchById(String matchId);
 
     MatchStatus getMatchStatus(String matchId);
 

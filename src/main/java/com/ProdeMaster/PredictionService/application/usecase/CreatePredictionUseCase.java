@@ -111,7 +111,7 @@ public class CreatePredictionUseCase implements CreatePredictionInboundPort {
 
     private MatchServiceClient.MatchInfo fetchMatch(String matchId) {
         try {
-            return matchServiceClient.getMatch(matchId);
+            return matchServiceClient.getMatchById(matchId);
         } catch (Exception e) {
             throw new InvalidPredictionException("Match not found: " + matchId, e);
         }
