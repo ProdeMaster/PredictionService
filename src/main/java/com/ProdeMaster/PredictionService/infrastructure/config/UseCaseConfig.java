@@ -62,4 +62,10 @@ public class UseCaseConfig {
             PredictionQueryPort predictionQueryPort) {
         return new GetPredictionsByUserUseCase(predictionQueryPort);
     }
+
+    @Bean
+    public GetPredictionsByUserAndGroupUseCase getPredictionsByUserAndGroupUseCase(
+            PredictionQueryPort predictionQueryPort) {
+        return new GetPredictionsByUserAndGroupUseCase(predictionQueryPort);
+    }
 }

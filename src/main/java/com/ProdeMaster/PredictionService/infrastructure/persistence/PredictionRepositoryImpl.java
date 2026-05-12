@@ -55,6 +55,11 @@ public class PredictionRepositoryImpl implements PredictionRepository {
     }
 
     @Override
+    public Page<Prediction> findByUserIdAndGroupId(String userId, String groupId, Pageable pageable) {
+        return predictionJpaRepository.findByUserIdAndGroupId(userId, groupId, pageable);
+    }
+
+    @Override
     public void delete(@NonNull Prediction prediction) {
         predictionJpaRepository.delete(prediction);
     }

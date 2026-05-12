@@ -43,4 +43,9 @@ public class PredictionQueryAdapter implements PredictionQueryPort {
     public boolean existsByUserIdAndMatchId(String userId, String matchId) {
         return predictionRepository.findByUserIdAndMatchId(userId, matchId).isPresent();
     }
+
+    @Override
+    public Page<Prediction> getByUserIdAndGroupId(String userId, String groupId, Pageable pageable) {
+        return predictionRepository.findByUserIdAndGroupId(userId, groupId, pageable);
+    }
 }

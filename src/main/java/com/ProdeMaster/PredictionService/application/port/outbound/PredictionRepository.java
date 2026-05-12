@@ -22,5 +22,7 @@ public interface PredictionRepository {
 
     List<Prediction> findByMatchIdAndStatus(String matchId, String status);
 
+    Page<Prediction> findByUserIdAndGroupId(String userId, String groupId, Pageable pageable);
+
     void delete(Prediction prediction);
 }

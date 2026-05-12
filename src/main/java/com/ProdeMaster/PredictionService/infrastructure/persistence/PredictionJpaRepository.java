@@ -24,4 +24,6 @@ interface PredictionJpaRepository extends JpaRepository<Prediction, String> {
 
     @Query("SELECT p FROM Prediction p WHERE p.matchId = :matchId AND p.status = :status")
     List<Prediction> findByMatchIdAndStatus(@Param("matchId") String matchId, @Param("status") String status);
+
+    Page<Prediction> findByUserIdAndGroupId(String userId, String groupId, Pageable pageable);
 }

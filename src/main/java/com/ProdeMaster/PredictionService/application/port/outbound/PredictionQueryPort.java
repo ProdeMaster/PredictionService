@@ -62,4 +62,14 @@ public interface PredictionQueryPort {
      * @return {@code true} if a prediction already exists
      */
     boolean existsByUserIdAndMatchId(String userId, String matchId);
+
+    /**
+     * Returns a paginated list of predictions for the given user and group.
+     *
+     * @param userId   user ID
+     * @param groupId  group ID
+     * @param pageable pagination and sort parameters
+     * @return paginated predictions, never null
+     */
+    Page<Prediction> getByUserIdAndGroupId(String userId, String groupId, Pageable pageable);
 }
