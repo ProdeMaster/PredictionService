@@ -7,11 +7,13 @@ import com.ProdeMaster.PredictionService.application.port.inbound.CancelPredicti
 import com.ProdeMaster.PredictionService.application.port.inbound.CreatePredictionInboundPort;
 import com.ProdeMaster.PredictionService.application.port.inbound.GetPredictionByIdInboundPort;
 import com.ProdeMaster.PredictionService.application.port.inbound.GetPredictionsByMatchInboundPort;
+import com.ProdeMaster.PredictionService.application.port.inbound.GetPredictionsByUserAndGroupInboundPort;
 import com.ProdeMaster.PredictionService.application.port.inbound.GetPredictionsByUserInboundPort;
 import com.ProdeMaster.PredictionService.application.port.inbound.UpdatePredictionInboundPort;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +30,7 @@ public class PredictionController {
     private final GetPredictionByIdInboundPort getPredictionByIdPort;
     private final GetPredictionsByMatchInboundPort getPredictionsByMatchPort;
     private final GetPredictionsByUserInboundPort getPredictionsByUserPort;
+    private final GetPredictionsByUserAndGroupInboundPort getPredictionsByUserAndGroupPort;
 
     public PredictionController(
             CreatePredictionInboundPort createPredictionPort,
@@ -35,13 +38,15 @@ public class PredictionController {
             CancelPredictionInboundPort cancelPredictionPort,
             GetPredictionByIdInboundPort getPredictionByIdPort,
             GetPredictionsByMatchInboundPort getPredictionsByMatchPort,
-            GetPredictionsByUserInboundPort getPredictionsByUserPort) {
+            GetPredictionsByUserInboundPort getPredictionsByUserPort,
+            GetPredictionsByUserAndGroupInboundPort getPredictionsByUserAndGroupPort) {
         this.createPredictionPort = createPredictionPort;
         this.updatePredictionPort = updatePredictionPort;
         this.cancelPredictionPort = cancelPredictionPort;
         this.getPredictionByIdPort = getPredictionByIdPort;
         this.getPredictionsByMatchPort = getPredictionsByMatchPort;
         this.getPredictionsByUserPort = getPredictionsByUserPort;
+        this.getPredictionsByUserAndGroupPort = getPredictionsByUserAndGroupPort;
     }
 
     @PostMapping
@@ -101,6 +106,19 @@ public class PredictionController {
                 PageRequest.of(page, size));
         return ResponseEntity.ok(predictions.map(PredictionResponse::fromDomain));
     }
+
+    // GET /api/v1/predictions/user/{userId}/group/{groupId}?page=0&size=20
+    // Defaults to createdAt DESC. Will switch to matchScheduledAt once P9 adds that field to Prediction.
+    @GetMapping("/user/{userId}/group/{groupId}")
+    public ResponseEntity<Page<PredictionResponse>> getPredictionsByUserAndGroup(
+            @PathVariable String userId,
+            @PathVariable String groupId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        var predictions = getPredictionsByUserAndGroupPort.getByUserIdAndGroupId(
+                userId,
+                groupId,
+                PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")));
+        return ResponseEntity.ok(predictions.map(PredictionResponse::fromDomain));
+    }
 }
-// TODO(P2): Agregar endpoint GET /user/{userId}/group/{groupId} para obtener
-// predicciones de un usuario en un grupo específico, paginadas y ordenadas por fecha del partido.
