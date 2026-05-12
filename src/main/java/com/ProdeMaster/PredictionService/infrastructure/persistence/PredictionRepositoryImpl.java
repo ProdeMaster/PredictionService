@@ -35,6 +35,11 @@ public class PredictionRepositoryImpl implements PredictionRepository {
     }
 
     @Override
+    public Optional<Prediction> findByUserIdAndMatchIdAndGroupId(String userId, String matchId, String groupId) {
+        return predictionJpaRepository.findByUserIdAndMatchIdAndGroupId(userId, matchId, groupId);
+    }
+
+    @Override
     public List<Prediction> findByMatchId(String matchId) {
         return predictionJpaRepository.findByMatchId(matchId);
     }

@@ -16,6 +16,8 @@ interface PredictionJpaRepository extends JpaRepository<Prediction, String> {
 
     Optional<Prediction> findByUserIdAndMatchId(String userId, String matchId);
 
+    Optional<Prediction> findByUserIdAndMatchIdAndGroupId(String userId, String matchId, String groupId);
+
     List<Prediction> findByMatchId(String matchId);
 
     Page<Prediction> findByUserId(String userId, Pageable pageable);

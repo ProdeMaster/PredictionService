@@ -1,6 +1,7 @@
 package com.ProdeMaster.PredictionService.application.port.inbound;
 
 import com.ProdeMaster.PredictionService.domain.model.Prediction;
+import java.util.List;
 
 /**
  * Inbound port for the "create a new prediction" use case.
@@ -19,15 +20,18 @@ import com.ProdeMaster.PredictionService.domain.model.Prediction;
 public interface CreatePredictionInboundPort {
 
     /**
-     * Creates a new prediction for the given user and match.
+     * Creates one or more predictions for the given user and match.
+     *
+     * <p>When {@code groupId} is provided, a single prediction is created for that
+     * group. When {@code groupId} is {@code null}, one prediction is created for
+     * every group the user currently belongs to (resolved via {@code GroupServiceClient}).
      *
      * @param userId        ID of the user making the prediction
      * @param matchId       ID of the match being predicted
-     * @param homeTeamGoals number of goals the user predicts for the home team
-     *                      (must be &ge; 0)
-     * @param awayTeamGoals number of goals the user predicts for the away team
-     *                      (must be &ge; 0)
-     * @return the persisted {@link Prediction}
+     * @param homeTeamGoals number of goals the user predicts for the home team (must be &ge; 0)
+     * @param awayTeamGoals number of goals the user predicts for the away team (must be &ge; 0)
+     * @param groupId       ID of the target group, or {@code null} to target all groups
+     * @return list of persisted {@link Prediction} instances (one per target group)
      */
-    Prediction create(String userId, String matchId, int homeTeamGoals, int awayTeamGoals);
+    List<Prediction> create(String userId, String matchId, int homeTeamGoals, int awayTeamGoals, String groupId);
 }

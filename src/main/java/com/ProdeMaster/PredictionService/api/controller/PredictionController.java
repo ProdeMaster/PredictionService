@@ -44,18 +44,17 @@ public class PredictionController {
         this.getPredictionsByUserPort = getPredictionsByUserPort;
     }
 
-    // TODO: Modificar body para que reciba, tambien, el id de grupo. Si es null se
-    // actualiza en todos los grupos para el usuario con id=UserId
     @PostMapping
-    public ResponseEntity<PredictionResponse> createPrediction(
+    public ResponseEntity<List<PredictionResponse>> createPrediction(
             @Valid @RequestBody CreatePredictionRequest request) {
-        var prediction = createPredictionPort.create(
+        var predictions = createPredictionPort.create(
                 request.userId(),
                 request.matchId(),
                 request.homeTeamGoals(),
-                request.awayTeamGoals());
+                request.awayTeamGoals(),
+                request.groupId());
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(PredictionResponse.fromDomain(prediction));
+                .body(predictions.stream().map(PredictionResponse::fromDomain).toList());
     }
 
     @PutMapping("/{id}")
@@ -103,8 +102,5 @@ public class PredictionController {
         return ResponseEntity.ok(predictions.map(PredictionResponse::fromDomain));
     }
 }
-/*
- * TODO: Agregar endpoint para obtener predicciones por UserId y GroupId
- * paginado.
- * Ordenar las predicciones por fecha del partido.
- */
+// TODO(P2): Agregar endpoint GET /user/{userId}/group/{groupId} para obtener
+// predicciones de un usuario en un grupo específico, paginadas y ordenadas por fecha del partido.

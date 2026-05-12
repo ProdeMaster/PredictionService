@@ -29,6 +29,7 @@ public class Prediction {
     private String id;
     private String userId;
     private String matchId;
+    private String groupId;
     // The exact scoreline predicted by the user.
     private MatchScore predictedScore;
     private PredictionStatus status;
@@ -36,10 +37,11 @@ public class Prediction {
     private Instant updatedAt;
     private Long version;
 
-    private Prediction(String id, String userId, String matchId, MatchScore predictedScore) {
+    private Prediction(String id, String userId, String matchId, String groupId, MatchScore predictedScore) {
         this.id = id;
         this.userId = userId;
         this.matchId = matchId;
+        this.groupId = groupId;
         this.predictedScore = predictedScore;
         this.status = PredictionStatus.PENDING;
         this.createdAt = Instant.now();
@@ -51,6 +53,8 @@ public class Prediction {
      *
      * @param userId         identifier of the user making the prediction
      * @param matchId        identifier of the match being predicted
+     * @param groupId        identifier of the group this prediction belongs to
+     *                       (nullable — null means no specific group context)
      * @param predictedScore exact scoreline the user is predicting (must not be
      *                       null)
      * @return a new {@code Prediction} in {@link PredictionStatus#PENDING} status
@@ -58,7 +62,7 @@ public class Prediction {
      * @throws IllegalArgumentException   if {@code userId} or {@code matchId} is
      *                                    null or blank
      */
-    public static Prediction create(String userId, String matchId, MatchScore predictedScore) {
+    public static Prediction create(String userId, String matchId, String groupId, MatchScore predictedScore) {
         if (predictedScore == null) {
             throw new InvalidPredictionException("A predicted score must be provided");
         }
@@ -68,7 +72,7 @@ public class Prediction {
         if (matchId == null || matchId.isBlank()) {
             throw new IllegalArgumentException("Match ID must be provided");
         }
-        return new Prediction(UUID.randomUUID().toString(), userId, matchId, predictedScore);
+        return new Prediction(UUID.randomUUID().toString(), userId, matchId, groupId, predictedScore);
     }
 
     public String getId() {
@@ -81,6 +85,10 @@ public class Prediction {
 
     public String getMatchId() {
         return matchId;
+    }
+
+    public String getGroupId() {
+        return groupId;
     }
 
     public MatchScore getPredictedScore() {

@@ -17,5 +17,8 @@ public record CreatePredictionRequest(
 
     @NotNull(message = "Away team goals is required")
     @Min(value = 0, message = "Away team goals cannot be negative")
-    Integer awayTeamGoals
+    Integer awayTeamGoals,
+
+    // Nullable: if null, the prediction is created for all groups the user belongs to.
+    String groupId
 ) {}

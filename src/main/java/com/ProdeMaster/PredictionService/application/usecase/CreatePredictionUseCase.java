@@ -2,15 +2,18 @@ package com.ProdeMaster.PredictionService.application.usecase;
 
 import com.ProdeMaster.PredictionService.application.port.inbound.CreatePredictionInboundPort;
 import com.ProdeMaster.PredictionService.application.port.outbound.EventPublisher;
+import com.ProdeMaster.PredictionService.application.port.outbound.GroupServiceClient;
 import com.ProdeMaster.PredictionService.application.port.outbound.MatchServiceClient;
 import com.ProdeMaster.PredictionService.application.port.outbound.PredictionRepository;
+import com.ProdeMaster.PredictionService.domain.exception.InvalidPredictionException;
 import com.ProdeMaster.PredictionService.domain.exception.PredictionAlreadyExistsException;
 import com.ProdeMaster.PredictionService.domain.model.MatchScore;
 import com.ProdeMaster.PredictionService.domain.model.Prediction;
-import com.ProdeMaster.PredictionService.domain.exception.InvalidPredictionException;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Application use case: create a new prediction for a given user and match.
@@ -30,16 +33,19 @@ public class CreatePredictionUseCase implements CreatePredictionInboundPort {
 
     private final PredictionRepository predictionRepository;
     private final MatchServiceClient matchServiceClient;
+    private final GroupServiceClient groupServiceClient;
     private final EventPublisher eventPublisher;
     private final int bufferMinutesBeforeMatch;
 
     public CreatePredictionUseCase(
             PredictionRepository predictionRepository,
             MatchServiceClient matchServiceClient,
+            GroupServiceClient groupServiceClient,
             EventPublisher eventPublisher,
             int bufferMinutesBeforeMatch) {
         this.predictionRepository = predictionRepository;
         this.matchServiceClient = matchServiceClient;
+        this.groupServiceClient = groupServiceClient;
         this.eventPublisher = eventPublisher;
         this.bufferMinutesBeforeMatch = bufferMinutesBeforeMatch;
     }
@@ -53,18 +59,19 @@ public class CreatePredictionUseCase implements CreatePredictionInboundPort {
      *   <li>Delegate match-status check to the domain rule
      *       {@link Prediction#validateMatchAcceptsPredictions(String)}.</li>
      *   <li>Validate the cut-off time has not yet passed.</li>
-     *   <li>Validate no duplicate prediction exists for this user + match.</li>
-     *   <li>Build a {@link MatchScore} and create the {@link Prediction} aggregate.</li>
-     *   <li>Persist and publish a {@code PredictionCreatedEvent}.</li>
+     *   <li>Resolve target groups: if {@code groupId} is provided use it;
+     *       otherwise fetch all groups the user belongs to via {@link GroupServiceClient}.</li>
+     *   <li>For each target group: check for duplicate, build the aggregate, persist,
+     *       and publish a {@code PredictionCreatedEvent}.</li>
      * </ol>
      */
     @Override
-    public Prediction create(String userId, String matchId, int homeTeamGoals, int awayTeamGoals) {
+    public List<Prediction> create(String userId, String matchId, int homeTeamGoals, int awayTeamGoals, String groupId) {
 
         // 1. Fetch match — throws InvalidPredictionException if not found
         MatchServiceClient.MatchInfo matchInfo = fetchMatch(matchId);
 
-        // 2. Domain rule: is the match accepting predictions? (delegated to domain)
+        // 2. Domain rule: is the match accepting predictions?
         Prediction.validateMatchAcceptsPredictions(matchInfo.status());
 
         // 3. Cut-off time guard
@@ -76,38 +83,62 @@ public class CreatePredictionUseCase implements CreatePredictionInboundPort {
                 ". Predictions closed at " + cutoffTime);
         }
 
-        // 4. Duplicate check
-        if (predictionRepository.findByUserIdAndMatchId(userId, matchId).isPresent()) {
-            throw new PredictionAlreadyExistsException(
-                "User " + userId + " already has a prediction for match " + matchId);
+        // 4. Resolve target groups
+        List<String> targetGroupIds = resolveTargetGroups(userId, groupId);
+
+        // 5. Build score (shared across all groups)
+        MatchScore predictedScore = MatchScore.of(homeTeamGoals, awayTeamGoals);
+
+        // 6. Create one prediction per target group
+        List<Prediction> results = new ArrayList<>();
+        for (String targetGroupId : targetGroupIds) {
+
+            // 6a. Duplicate check per (userId, matchId, groupId)
+            if (predictionRepository.findByUserIdAndMatchIdAndGroupId(userId, matchId, targetGroupId).isPresent()) {
+                throw new PredictionAlreadyExistsException(
+                    "User " + userId + " already has a prediction for match " + matchId +
+                    " in group " + targetGroupId);
+            }
+
+            // 6b. Create aggregate
+            Prediction prediction = Prediction.create(userId, matchId, targetGroupId, predictedScore);
+
+            // 6c. Persist
+            Prediction saved = predictionRepository.save(prediction);
+            results.add(saved);
+
+            // 6d. Publish event
+            eventPublisher.publishPredictionCreated(
+                new EventPublisher.PredictionCreatedEvent(
+                    saved.getId(),
+                    saved.getUserId(),
+                    saved.getMatchId(),
+                    saved.getPredictedScore().getHomeTeamGoals(),
+                    saved.getPredictedScore().getAwayTeamGoals(),
+                    saved.getStatus().name(),
+                    Instant.now()
+                )
+            );
         }
 
-        // 5. Build domain value object + aggregate
-        MatchScore predictedScore = MatchScore.of(homeTeamGoals, awayTeamGoals);
-        Prediction prediction = Prediction.create(userId, matchId, predictedScore);
-
-        // 6. Persist
-        Prediction savedPrediction = predictionRepository.save(prediction);
-
-        // 7. Publish event
-        eventPublisher.publishPredictionCreated(
-            new EventPublisher.PredictionCreatedEvent(
-                savedPrediction.getId(),
-                savedPrediction.getUserId(),
-                savedPrediction.getMatchId(),
-                savedPrediction.getPredictedScore().getHomeTeamGoals(),
-                savedPrediction.getPredictedScore().getAwayTeamGoals(),
-                savedPrediction.getStatus().name(),
-                Instant.now()
-            )
-        );
-
-        return savedPrediction;
+        return results;
     }
 
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
+
+    private List<String> resolveTargetGroups(String userId, String groupId) {
+        if (groupId != null && !groupId.isBlank()) {
+            return List.of(groupId);
+        }
+        List<String> allGroups = groupServiceClient.getGroupIdsByUserId(userId);
+        if (allGroups.isEmpty()) {
+            throw new InvalidPredictionException(
+                "No groupId provided and user " + userId + " does not belong to any group");
+        }
+        return allGroups;
+    }
 
     private MatchServiceClient.MatchInfo fetchMatch(String matchId) {
         try {
