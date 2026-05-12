@@ -1,6 +1,7 @@
 package com.ProdeMaster.PredictionService.infrastructure.config;
 
 import com.ProdeMaster.PredictionService.application.port.outbound.EventPublisher;
+import com.ProdeMaster.PredictionService.application.port.outbound.GroupServiceClient;
 import com.ProdeMaster.PredictionService.application.port.outbound.MatchServiceClient;
 import com.ProdeMaster.PredictionService.application.port.outbound.PredictionQueryPort;
 import com.ProdeMaster.PredictionService.application.port.outbound.PredictionRepository;
@@ -20,10 +21,11 @@ public class UseCaseConfig {
     public CreatePredictionUseCase createPredictionUseCase(
             PredictionRepository predictionRepository,
             MatchServiceClient matchServiceClient,
+            GroupServiceClient groupServiceClient,
             EventPublisher eventPublisher,
             @Value("${app.prediction.buffer-minutes-before-match:5}") int bufferMinutesBeforeMatch) {
         return new CreatePredictionUseCase(
-                predictionRepository, matchServiceClient, eventPublisher, bufferMinutesBeforeMatch);
+                predictionRepository, matchServiceClient, groupServiceClient, eventPublisher, bufferMinutesBeforeMatch);
     }
 
     @Bean
