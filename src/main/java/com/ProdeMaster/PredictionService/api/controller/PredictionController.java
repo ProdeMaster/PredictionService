@@ -44,6 +44,8 @@ public class PredictionController {
         this.getPredictionsByUserPort = getPredictionsByUserPort;
     }
 
+    // TODO: Modificar body para que reciba, tambien, el id de grupo. Si es null se
+    // actualiza en todos los grupos para el usuario con id=UserId
     @PostMapping
     public ResponseEntity<PredictionResponse> createPrediction(
             @Valid @RequestBody CreatePredictionRequest request) {
@@ -51,8 +53,7 @@ public class PredictionController {
                 request.userId(),
                 request.matchId(),
                 request.homeTeamGoals(),
-                request.awayTeamGoals()
-            );
+                request.awayTeamGoals());
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(PredictionResponse.fromDomain(prediction));
     }
@@ -64,8 +65,7 @@ public class PredictionController {
         var prediction = updatePredictionPort.update(
                 id,
                 request.homeTeamGoals(),
-                request.awayTeamGoals()
-            );
+                request.awayTeamGoals());
         return ResponseEntity.ok(PredictionResponse.fromDomain(prediction));
     }
 
@@ -98,9 +98,13 @@ public class PredictionController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         var predictions = getPredictionsByUserPort.getByUserId(
-                userId, 
-                PageRequest.of(page, size)
-        );
+                userId,
+                PageRequest.of(page, size));
         return ResponseEntity.ok(predictions.map(PredictionResponse::fromDomain));
     }
 }
+/*
+ * TODO: Agregar endpoint para obtener predicciones por UserId y GroupId
+ * paginado.
+ * Ordenar las predicciones por fecha del partido.
+ */
