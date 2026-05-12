@@ -5,10 +5,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
+import org.springframework.lang.NonNull;
 
 @Configuration
 public class KafkaConfig {
 
+    @NonNull
     @Value("${app.kafka.topic.prediction-events}")
     private String predictionEventsTopic;
 

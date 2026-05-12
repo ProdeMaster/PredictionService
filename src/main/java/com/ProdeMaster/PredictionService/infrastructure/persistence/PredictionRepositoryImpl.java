@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.lang.NonNull;
 
 @Repository
 public class PredictionRepositoryImpl implements PredictionRepository {
@@ -19,12 +20,12 @@ public class PredictionRepositoryImpl implements PredictionRepository {
     }
 
     @Override
-    public Prediction save(Prediction prediction) {
+    public Prediction save(@NonNull Prediction prediction) {
         return predictionJpaRepository.save(prediction);
     }
 
     @Override
-    public Optional<Prediction> findById(String id) {
+    public Optional<Prediction> findById(@NonNull String id) {
         return predictionJpaRepository.findById(id);
     }
 
@@ -49,7 +50,7 @@ public class PredictionRepositoryImpl implements PredictionRepository {
     }
 
     @Override
-    public void delete(Prediction prediction) {
+    public void delete(@NonNull Prediction prediction) {
         predictionJpaRepository.delete(prediction);
     }
 }

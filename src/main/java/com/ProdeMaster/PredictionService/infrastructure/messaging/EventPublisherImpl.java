@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.lang.NonNull;
 
 @Component
 public class EventPublisherImpl implements EventPublisher {
@@ -17,7 +18,7 @@ public class EventPublisherImpl implements EventPublisher {
 
     public EventPublisherImpl(
             KafkaTemplate<String, Object> kafkaTemplate,
-            @Value("${app.kafka.topic.prediction-events}") String topicName) {
+            @NonNull @Value("${app.kafka.topic.prediction-events}") String topicName) {
         this.kafkaTemplate = kafkaTemplate;
         this.topicName = topicName;
     }

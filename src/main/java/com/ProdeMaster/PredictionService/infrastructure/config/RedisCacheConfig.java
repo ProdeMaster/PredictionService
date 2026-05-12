@@ -10,13 +10,15 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 
 import java.time.Duration;
+import org.springframework.lang.NonNull;
 
 @Configuration
 @EnableCaching
 public class RedisCacheConfig {
 
     @Bean
-    public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+    @SuppressWarnings("null")
+    public RedisCacheManager cacheManager(@NonNull RedisConnectionFactory connectionFactory) {
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(2))
                 .serializeValuesWith(
