@@ -5,20 +5,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record CreatePredictionRequest(
-    @NotBlank(message = "User ID is required")
-    String userId,
+        @NotBlank(message = "Match ID is required") String matchId,
 
-    @NotBlank(message = "Match ID is required")
-    String matchId,
+        @NotNull(message = "Home team goals is required") @Min(value = 0, message = "Home team goals cannot be negative") Integer homeTeamGoals,
 
-    @NotNull(message = "Home team goals is required")
-    @Min(value = 0, message = "Home team goals cannot be negative")
-    Integer homeTeamGoals,
+        @NotNull(message = "Away team goals is required") @Min(value = 0, message = "Away team goals cannot be negative") Integer awayTeamGoals,
 
-    @NotNull(message = "Away team goals is required")
-    @Min(value = 0, message = "Away team goals cannot be negative")
-    Integer awayTeamGoals,
-
-    // Nullable: if null, the prediction is created for all groups the user belongs to.
-    String groupId
-) {}
+        // Nullable: if null, the prediction is created for all groups the user belongs
+        // to.
+        String groupId) {
+}
