@@ -20,6 +20,18 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(MissingUserHeaderException.class)
+    public ResponseEntity<Map<String, Object>> handleMissingUserHeader(MissingUserHeaderException ex) {
+        log.warn("Missing X-User-Id header: {}", ex.getMessage());
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(ForbiddenAccessException.class)
+    public ResponseEntity<Map<String, Object>> handleForbiddenAccess(ForbiddenAccessException ex) {
+        log.warn("Forbidden access: {}", ex.getMessage());
+        return buildResponse(HttpStatus.FORBIDDEN, ex.getMessage());
+    }
+
     @ExceptionHandler(PredictionNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handlePredictionNotFound(PredictionNotFoundException ex) {
         log.warn("Prediction not found: {}", ex.getMessage());
