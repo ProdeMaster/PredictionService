@@ -10,6 +10,7 @@ import com.ProdeMaster.PredictionService.application.port.inbound.GetPredictions
 import com.ProdeMaster.PredictionService.application.port.inbound.GetPredictionsByUserAndGroupInboundPort;
 import com.ProdeMaster.PredictionService.application.port.inbound.GetPredictionsByUserInboundPort;
 import com.ProdeMaster.PredictionService.application.port.inbound.UpdatePredictionInboundPort;
+import com.ProdeMaster.PredictionService.api.exception.MissingUserHeaderException;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -51,9 +52,11 @@ public class PredictionController {
 
     @PostMapping
     public ResponseEntity<List<PredictionResponse>> createPrediction(
+            @RequestHeader(value = "X-User-Id", required = false) String gatewayUserId,
             @Valid @RequestBody CreatePredictionRequest request) {
+        requireGatewayHeader(gatewayUserId);
         var predictions = createPredictionPort.create(
-                request.userId(),
+                gatewayUserId,
                 request.matchId(),
                 request.homeTeamGoals(),
                 request.awayTeamGoals(),
@@ -64,8 +67,10 @@ public class PredictionController {
 
     @PutMapping("/{id}")
     public ResponseEntity<PredictionResponse> updatePrediction(
+            @RequestHeader(value = "X-User-Id", required = false) String gatewayUserId,
             @PathVariable String id,
             @Valid @RequestBody UpdatePredictionRequest request) {
+        requireGatewayHeader(gatewayUserId);
         var prediction = updatePredictionPort.update(
                 id,
                 request.homeTeamGoals(),
@@ -75,18 +80,24 @@ public class PredictionController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<PredictionResponse> cancelPrediction(
+            @RequestHeader(value = "X-User-Id", required = false) String gatewayUserId,
             @PathVariable String id,
             @RequestParam(required = false, defaultValue = "User cancelled") String reason) {
+        requireGatewayHeader(gatewayUserId);
         var prediction = cancelPredictionPort.cancel(id, reason);
         return ResponseEntity.ok(PredictionResponse.fromDomain(prediction));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PredictionResponse> getPredictionById(@PathVariable String id) {
+    public ResponseEntity<PredictionResponse> getPredictionById(
+            @RequestHeader(value = "X-User-Id", required = false) String gatewayUserId,
+            @PathVariable String id) {
+        requireGatewayHeader(gatewayUserId);
         var prediction = getPredictionByIdPort.getById(id);
         return ResponseEntity.ok(PredictionResponse.fromDomain(prediction));
     }
 
+    // Public — no authentication required (querying a match's predictions is open)
     @GetMapping("/match/{matchId}")
     public ResponseEntity<List<PredictionResponse>> getPredictionsByMatch(
             @PathVariable String matchId) {
@@ -96,29 +107,43 @@ public class PredictionController {
                 .toList());
     }
 
+    // Method to be able to view another user's predictions.
     @GetMapping("/user/{userId}")
     public ResponseEntity<Page<PredictionResponse>> getPredictionsByUser(
+            @RequestHeader(value = "X-User-Id", required = false) String gatewayUserId,
             @PathVariable String userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
+        requireGatewayHeader(gatewayUserId);
         var predictions = getPredictionsByUserPort.getByUserId(
                 userId,
                 PageRequest.of(page, size));
         return ResponseEntity.ok(predictions.map(PredictionResponse::fromDomain));
     }
 
-    // GET /api/v1/predictions/user/{userId}/group/{groupId}?page=0&size=20
-    // Defaults to createdAt DESC. Will switch to matchScheduledAt once P9 adds that field to Prediction.
-    @GetMapping("/user/{userId}/group/{groupId}")
+    // Method to be able to view another user's predictions in a specific group.
+    @GetMapping("/group/{groupId}")
     public ResponseEntity<Page<PredictionResponse>> getPredictionsByUserAndGroup(
-            @PathVariable String userId,
+            @RequestHeader(value = "X-User-Id", required = false) String gatewayUserId,
             @PathVariable String groupId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
+        requireGatewayHeader(gatewayUserId);
         var predictions = getPredictionsByUserAndGroupPort.getByUserIdAndGroupId(
-                userId,
+                gatewayUserId,
                 groupId,
                 PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")));
         return ResponseEntity.ok(predictions.map(PredictionResponse::fromDomain));
+    }
+
+    // -------------------------------------------------------------------------
+    // Gateway identity helpers
+    // -------------------------------------------------------------------------
+
+    private void requireGatewayHeader(String gatewayUserId) {
+        if (gatewayUserId == null || gatewayUserId.isBlank()) {
+            throw new MissingUserHeaderException(
+                    "Required header 'X-User-Id' is missing or empty. Ensure the request passes through the API Gateway.");
+        }
     }
 }
