@@ -30,22 +30,27 @@ public class Prediction {
     private String userId;
     private String matchId;
     private String groupId;
-    // The exact scoreline predicted by the user.
     private MatchScore predictedScore;
     private PredictionStatus status;
+    private Instant matchScheduledAt;
     private Instant createdAt;
     private Instant updatedAt;
     private Long version;
 
-    private Prediction(String id, String userId, String matchId, String groupId, MatchScore predictedScore) {
+    private Prediction(String id, String userId, String matchId, String groupId,
+                       MatchScore predictedScore, PredictionStatus status,
+                       Instant matchScheduledAt, Instant createdAt, Instant updatedAt,
+                       Long version) {
         this.id = id;
         this.userId = userId;
         this.matchId = matchId;
         this.groupId = groupId;
         this.predictedScore = predictedScore;
-        this.status = PredictionStatus.PENDING;
-        this.createdAt = Instant.now();
-        this.updatedAt = Instant.now();
+        this.status = status;
+        this.matchScheduledAt = matchScheduledAt;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.version = version;
     }
 
     /**
@@ -62,7 +67,7 @@ public class Prediction {
      * @throws IllegalArgumentException   if {@code userId} or {@code matchId} is
      *                                    null or blank
      */
-    public static Prediction create(String userId, String matchId, String groupId, MatchScore predictedScore) {
+    public static Prediction create(String userId, String matchId, String groupId, MatchScore predictedScore, Instant matchScheduledAt) {
         if (predictedScore == null) {
             throw new InvalidPredictionException("A predicted score must be provided");
         }
@@ -72,7 +77,17 @@ public class Prediction {
         if (matchId == null || matchId.isBlank()) {
             throw new IllegalArgumentException("Match ID must be provided");
         }
-        return new Prediction(UUID.randomUUID().toString(), userId, matchId, groupId, predictedScore);
+        Instant now = Instant.now();
+        return new Prediction(UUID.randomUUID().toString(), userId, matchId, groupId,
+                predictedScore, PredictionStatus.PENDING, matchScheduledAt, now, now, null);
+    }
+
+    public static Prediction reconstitute(String id, String userId, String matchId, String groupId,
+                                          MatchScore predictedScore, PredictionStatus status,
+                                          Instant matchScheduledAt, Instant createdAt, Instant updatedAt,
+                                          Long version) {
+        return new Prediction(id, userId, matchId, groupId, predictedScore, status,
+                matchScheduledAt, createdAt, updatedAt, version);
     }
 
     public String getId() {
@@ -89,6 +104,10 @@ public class Prediction {
 
     public String getGroupId() {
         return groupId;
+    }
+
+    public Instant getMatchScheduledAt() {
+        return matchScheduledAt;
     }
 
     public MatchScore getPredictedScore() {

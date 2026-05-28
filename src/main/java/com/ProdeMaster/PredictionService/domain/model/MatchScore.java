@@ -29,13 +29,17 @@ public final class MatchScore {
 
     public static final int MAX_GOALS_PER_TEAM = 30;
 
-    public MatchScore(int homeTeamGoals, int awayTeamGoals) {
+    private MatchScore(int homeTeamGoals, int awayTeamGoals) {
         validate(homeTeamGoals, awayTeamGoals);
         this.homeTeamGoals = homeTeamGoals;
         this.awayTeamGoals = awayTeamGoals;
     }
 
     public static MatchScore of(int homeTeamGoals, int awayTeamGoals) {
+        return new MatchScore(homeTeamGoals, awayTeamGoals);
+    }
+
+    public static MatchScore reconstitute(int homeTeamGoals, int awayTeamGoals) {
         return new MatchScore(homeTeamGoals, awayTeamGoals);
     }
 
