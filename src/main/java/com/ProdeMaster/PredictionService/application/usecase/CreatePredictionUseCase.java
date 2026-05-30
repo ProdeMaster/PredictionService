@@ -101,7 +101,7 @@ public class CreatePredictionUseCase implements CreatePredictionInboundPort {
             }
 
             // 6b. Create aggregate
-            Prediction prediction = Prediction.create(userId, matchId, targetGroupId, predictedScore);
+            Prediction prediction = Prediction.create(userId, matchId, targetGroupId, predictedScore, matchInfo.scheduledAt());
 
             // 6c. Persist
             Prediction saved = predictionRepository.save(prediction);

@@ -12,6 +12,7 @@ public record PredictionResponse(
     int awayTeamGoals,
     String outcome,
     String status,
+    Instant matchScheduledAt,
     Instant createdAt,
     Instant updatedAt
 ) {
@@ -25,6 +26,7 @@ public record PredictionResponse(
             prediction.getPredictedScore().getAwayTeamGoals(),
             prediction.getDerivedOutcome().name(),
             prediction.getStatus().name(),
+            prediction.getMatchScheduledAt(),
             prediction.getCreatedAt(),
             prediction.getUpdatedAt()
         );
