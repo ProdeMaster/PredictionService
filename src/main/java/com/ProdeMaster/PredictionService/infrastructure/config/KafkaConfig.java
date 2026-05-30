@@ -10,9 +10,11 @@ import org.springframework.lang.NonNull;
 @Configuration
 public class KafkaConfig {
 
-    @NonNull
-    @Value("${app.kafka.topic.prediction-events}")
-    private String predictionEventsTopic;
+    private final String predictionEventsTopic;
+
+    public KafkaConfig(@NonNull @Value("${app.kafka.topic.prediction-events}") String predictionEventsTopic) {
+        this.predictionEventsTopic = predictionEventsTopic;
+    }
 
     @Bean
     public NewTopic predictionEventsTopic() {

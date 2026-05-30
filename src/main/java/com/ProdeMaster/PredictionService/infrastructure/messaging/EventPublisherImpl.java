@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.lang.NonNull;
 
 @Component
+@SuppressWarnings("null")
 public class EventPublisherImpl implements EventPublisher {
 
     private static final Logger log = LoggerFactory.getLogger(EventPublisherImpl.class);

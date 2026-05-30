@@ -1,6 +1,5 @@
 package com.ProdeMaster.PredictionService.infrastructure.persistence;
 
-import com.ProdeMaster.PredictionService.domain.model.Prediction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,18 +11,20 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-interface PredictionJpaRepository extends JpaRepository<Prediction, String> {
+interface PredictionJpaRepository extends JpaRepository<PredictionJpaEntity, String> {
 
-    Optional<Prediction> findByUserIdAndMatchId(String userId, String matchId);
+    Optional<PredictionJpaEntity> findByUserIdAndMatchId(String userId, String matchId);
 
-    Optional<Prediction> findByUserIdAndMatchIdAndGroupId(String userId, String matchId, String groupId);
+    Optional<PredictionJpaEntity> findByUserIdAndMatchIdAndGroupId(String userId, String matchId, String groupId);
 
-    List<Prediction> findByMatchId(String matchId);
+    List<PredictionJpaEntity> findByMatchId(String matchId);
 
-    Page<Prediction> findByUserId(String userId, Pageable pageable);
+    Page<PredictionJpaEntity> findByMatchId(String matchId, Pageable pageable);
 
-    @Query("SELECT p FROM Prediction p WHERE p.matchId = :matchId AND p.status = :status")
-    List<Prediction> findByMatchIdAndStatus(@Param("matchId") String matchId, @Param("status") String status);
+    Page<PredictionJpaEntity> findByUserId(String userId, Pageable pageable);
 
-    Page<Prediction> findByUserIdAndGroupId(String userId, String groupId, Pageable pageable);
+    @Query("SELECT p FROM PredictionJpaEntity p WHERE p.matchId = :matchId AND p.status = :status")
+    List<PredictionJpaEntity> findByMatchIdAndStatus(@Param("matchId") String matchId, @Param("status") String status);
+
+    Page<PredictionJpaEntity> findByUserIdAndGroupId(String userId, String groupId, Pageable pageable);
 }
