@@ -16,6 +16,8 @@ public interface PredictionRepository {
 
     Optional<Prediction> findByUserIdAndMatchIdAndGroupId(String userId, String matchId, String groupId);
 
+    Page<Prediction> findByMatchId(String matchId, Pageable pageable);
+
     List<Prediction> findByMatchId(String matchId);
 
     Page<Prediction> findByUserId(String userId, Pageable pageable);

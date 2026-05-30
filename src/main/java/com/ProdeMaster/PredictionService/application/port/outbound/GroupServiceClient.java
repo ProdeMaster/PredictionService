@@ -19,4 +19,13 @@ public interface GroupServiceClient {
      * @return a non-null, possibly empty list of group IDs
      */
     List<String> getGroupIdsByUserId(String userId);
+
+    /**
+     * Returns whether the given user is a member of the given group.
+     *
+     * @param userId  the user to check
+     * @param groupId the group to check membership in
+     * @return {@code true} if the user belongs to the group
+     */
+    boolean isUserMemberOfGroup(String userId, String groupId);
 }

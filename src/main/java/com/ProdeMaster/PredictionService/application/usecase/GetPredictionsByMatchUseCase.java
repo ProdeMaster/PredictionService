@@ -4,7 +4,8 @@ import com.ProdeMaster.PredictionService.application.port.inbound.GetPredictions
 import com.ProdeMaster.PredictionService.application.port.outbound.PredictionQueryPort;
 import com.ProdeMaster.PredictionService.domain.model.Prediction;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Application use case: retrieve all predictions for a given match.
@@ -24,7 +25,7 @@ public class GetPredictionsByMatchUseCase implements GetPredictionsByMatchInboun
     }
 
     @Override
-    public List<Prediction> getByMatchId(String matchId) {
-        return predictionQueryPort.getByMatchId(matchId);
+    public Page<Prediction> getByMatchId(String matchId, Pageable pageable) {
+        return predictionQueryPort.getByMatchId(matchId, pageable);
     }
 }

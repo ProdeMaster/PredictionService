@@ -4,7 +4,6 @@ import com.ProdeMaster.PredictionService.domain.model.Prediction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -29,12 +28,13 @@ public interface PredictionQueryPort {
     Optional<Prediction> getById(String id);
 
     /**
-     * Returns all predictions for the given match.
+     * Returns a paginated list of predictions for the given match.
      *
      * @param matchId match ID
-     * @return list of predictions (never null)
+     * @param pageable pagination parameters
+     * @return paginated predictions
      */
-    List<Prediction> getByMatchId(String matchId);
+    Page<Prediction> getByMatchId(String matchId, Pageable pageable);
 
     /**
      * Returns a paginated list of a user's predictions.

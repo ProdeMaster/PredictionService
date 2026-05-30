@@ -7,7 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,8 +24,8 @@ public class PredictionQueryAdapter implements PredictionQueryPort {
     }
 
     @Override
-    public List<Prediction> getByMatchId(String matchId) {
-        return predictionRepository.findByMatchId(matchId);
+    public Page<Prediction> getByMatchId(String matchId, Pageable pageable) {
+        return predictionRepository.findByMatchId(matchId, pageable);
     }
 
     @Override

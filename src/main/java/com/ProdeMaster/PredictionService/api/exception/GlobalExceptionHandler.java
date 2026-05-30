@@ -32,6 +32,12 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.FORBIDDEN, ex.getMessage());
     }
 
+    @ExceptionHandler(UserNotInGroupException.class)
+    public ResponseEntity<Map<String, Object>> handleUserNotInGroup(UserNotInGroupException ex) {
+        log.warn("User not in group: {}", ex.getMessage());
+        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
     @ExceptionHandler(PredictionNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handlePredictionNotFound(PredictionNotFoundException ex) {
         log.warn("Prediction not found: {}", ex.getMessage());

@@ -15,9 +15,9 @@ import org.springframework.data.domain.Pageable;
  *   <li>No {@code @Service} annotation — pure Java, wired by an infrastructure
  *       {@code @Configuration}.</li>
  *   <li>Depends on {@link PredictionQueryPort} (outbound) for reads.</li>
- *   <li>Sort order defaults to {@code createdAt DESC} at the controller layer.
- *       Ordering by match date ({@code matchScheduledAt}) requires P9 — adding that
- *       field to the Prediction entity.</li>
+ *   <li>Sort order is {@code matchScheduledAt ASC}, passed via {@link Pageable} from the controller.
+ *       The field is denormalized onto {@link com.ProdeMaster.PredictionService.domain.model.Prediction}
+ *       from the MatchService at creation time.</li>
  * </ul>
  */
 public class GetPredictionsByUserAndGroupUseCase implements GetPredictionsByUserAndGroupInboundPort {

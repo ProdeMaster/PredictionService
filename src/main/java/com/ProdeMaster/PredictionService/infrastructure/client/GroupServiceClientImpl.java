@@ -18,8 +18,10 @@ import java.util.List;
  * contract and URL are defined.
  */
 
-// TODO: Separar esta anotacion y llevarla a la capa de infraestructura para no
-// romper el principio de separacion de capas.
+/*
+ * TODO: Separar esta anotacion y llevarla a la capa de infraestructura para no
+ * romper el principio de separacion de capas.
+ */
 @Component
 public class GroupServiceClientImpl implements GroupServiceClient {
 
@@ -30,5 +32,13 @@ public class GroupServiceClientImpl implements GroupServiceClient {
         // TODO: implement HTTP call to GroupService once available
         log.warn("GroupServiceClient not yet implemented — returning empty list for userId={}", userId);
         return List.of();
+    }
+
+    @Override
+    public boolean isUserMemberOfGroup(String userId, String groupId) {
+        // TODO: implement HTTP call to GroupService once available
+        // Fail-closed: denying by default until the real client is wired.
+        log.warn("GroupServiceClient.isUserMemberOfGroup not yet implemented — denying by default for userId={}, groupId={}", userId, groupId);
+        return false;
     }
 }
